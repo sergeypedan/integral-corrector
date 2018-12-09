@@ -7,14 +7,40 @@ module Integral
     PRE_CHARACTERS  = [" ", "(", "«"]
     POST_CHARACTERS = [")", "»"]
     MDASHES         = ["-", "–"]
-    SPELLING_CORRECTIONS = [ ["т.е.", "т. е."] ]
-    MONTH_NAMES = { generative: %W[января февраля марта апреля мая июня июля августа сентября октября ноября декабря] }
+    MONTH_NAMES     = { generative: %W[января февраля марта апреля мая июня июля августа сентября октября ноября декабря] }
+    SPELLING_CORRECTIONS = [
+      ["Все-таки", "Всё-таки"],
+      [/\sвсе-таки/, " всё-таки"],
+      [/\sдает/, " даёт"],
+      [/\sее\s/, " её "],
+      [/Ее\s/, "Её "],
+      [/\sеще\s/, " ещё "],
+      [" Еще ", " Ещё "],
+      ["зашел", "зашёл"],
+      [/\sзвезд /, " звёзд "],
+      [/\sзвезд\./, " звёзд."],
+      [/\sзвезд\,/, " звёзд,"],
+      ["и т.д.", "и т.\u{00A0}д."],
+      ["и т.п.", "и т.\u{00A0}п."],
+      [/\sнесет/, " несёт"],
+      [/\sобъем/, " объём"],
+      ["Объем", "Объём"],
+      [/\sпришлем/, " пришлём"],
+      ["партнер", "партнёр"],
+      [/\sсвое\s/, " своё "],
+      ["своем", "своём"],
+      ["т.е.", "т.\u{00A0}е."],
+      [" нее ", " неё "],
+      ["удаленн", "удалённ"],
+      ["утонченн", "утончённ"],
+      ["\sчье ", " чьё "]
+    ]
 
     module_function
 
 
     def upcased_prepositions
-      PREPOSITIONS.map { |k| k.mb_chars.capitalize.to_s }
+      PREPOSITIONS.map { |k| k.capitalize.to_s }
     end
 
 
@@ -24,7 +50,7 @@ module Integral
 
 
     def fix_mdash(string)
-      return "" if string.blank?
+      return "" if string == "" || string.nil?
 
       MDASHES.each do |dash|
         string.gsub! " #{dash} ", " — "
@@ -35,7 +61,7 @@ module Integral
 
 
     def fix_quotations(s)
-      return "" if s.blank?
+      return "" if s == ""
       s.gsub(" \"", " «")
        .gsub(/\"(?=[\.,])/, "»")
        .gsub(/^\"/, "«")
@@ -43,16 +69,16 @@ module Integral
     end
 
 
-    def fix_units(s)
-      return "" if s.blank?
-      s.gsub(" рублей", "\u{00A0}₽")
-       .gsub(" руб.", "\u{00A0}₽")
-       .gsub(" руб ", "\u{00A0}₽ ")
+    def fix_units(string)
+      return "" if string == "" || string.nil?
+      string.gsub(" рублей", "\u{00A0}₽")
+            .gsub(" руб.", "\u{00A0}₽")
+            .gsub(" руб ", "\u{00A0}₽ ")
     end
 
 
     def fix_widow_prepositions(string)
-      return "" if string.blank?
+      return "" if string == "" || string.nil?
 
       PRE_CHARACTERS.each do |pre|
         all_prepositions.each do |k|
@@ -65,47 +91,18 @@ module Integral
 
 
     def fix_spelling(string)
-      return "" if string.blank?
+      return "" if string == "" || string.nil?
 
-      # SPELLING_CORRECTIONS.each do |error_pair|
-      #  ...
-      # end
+      SPELLING_CORRECTIONS.each do |incorrect, correct|
+        string.gsub! incorrect, correct
+      end
 
-      string.gsub! "3-х мерное", "3-мерное"
-      string.gsub! "все-таки", "всё-таки"
-      string.gsub! /\sдает/, " даёт"
-      string.gsub! /\sее\s/, " её "
-      string.gsub! /Ее\s/, "Её "
-      string.gsub! /\sеще\s/, " ещё "
-      string.gsub! " Еще ", " Ещё "
-      string.gsub! "зашел", "зашёл"
-      string.gsub! /\sзвезд /, " звёзд "
-      # string.gsub! / и\sо\s/, "и о "
-      string.gsub! "и т.д.", "и т.\u{00A0}д."
-      string.gsub! "и т.п.", "и т.\u{00A0}п."
-      string.gsub! /\sнесет/, " несёт"
-      string.gsub! "объем", "объём"
-      string.gsub! "Объем", "Объём"
-      string.gsub! "пришлем", "пришлём"
-      string.gsub! "партнер", "партнёр"
-      string.gsub! /\sсвое\s/, " своё "
-      string.gsub! "своем", "своём"
-      string.gsub! "т.е.", "т.\u{00A0}е."
-      string.gsub! /у нее /, "у неё "
-      string.gsub! "удаленно", "удалённо"
-      string.gsub! "утонченная", "утончённая"
-      string.gsub! "\sчье ", " чьё "
-
-      string.gsub! "еверо-Запад",  "еверо-запад"
-      string.gsub! "еверо-Восток", "еверо-восток"
-      string.gsub! "го-Запад",  "го-запад"
-      string.gsub! "го-Восток", "го-восток"
-      string
+      return string
     end
 
 
     def fix_date_before_month(string)
-      return "" if string.blank?
+      return "" if string == "" || string.nil?
 
       MONTH_NAMES[:generative].each do |month|
         string.gsub!  /(?<=\d) (?=#{month})/, "\u{00A0}"
@@ -122,6 +119,7 @@ module Integral
       string = fix_widow_prepositions(string)
       string = fix_date_before_month(string)
       string = fix_units(string)
+      string
     end
 
   end

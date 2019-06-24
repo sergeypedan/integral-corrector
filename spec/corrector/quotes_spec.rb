@@ -20,32 +20,42 @@ RSpec.describe Integral::Corrector do
 			end
 		end
 
-		context "after a space" do
+		context "between a space and a character" do
 			it "replaces quotation" do
 				expect( tst("дела. \"Тройки") ).to eq "дела. «Тройки"
 			end
 		end
 
-		context "before a dot" do
+		context "before a punctuation sign" do
+			let(:punctuation_literals) { %w[. , ? !] }
+
 			it "replaces quotation" do
-				expect( tst("слово\".") ).to eq "слово»."
+				punctuation_literals.each do |literal|
+					expect( tst("слово\"#{literal}") ).to eq "слово»#{literal}"
+				end
 			end
 		end
 
-		context "before a comma" do
+		context "at the beginning of line" do
 			it "replaces quotation" do
-				expect( tst("слово\",") ).to eq "слово»,"
+				expect( tst("\"Сон в летнюю ночь") ).to eq "«Сон в летнюю ночь"
+			end
+		end
+
+		context "at the end of line" do
+			it "replaces quotation" do
+				expect( tst("в летнюю ночь\"") ).to eq "в летнюю ночь»"
 			end
 		end
 
 		context "in HTML attributes" do
-			let(:domain) { "booking.com" }
-
+			let(:domain) { "https://booking.com" }
 			let(:html_tags) {
 				[
-					"<a href=\"http://#{domain}\">#{domain}</a>",
-					"<a href=\"http://#{domain}\" target=\"_blank\">#{domain}</a>",
-					"<a href=\"http://#{domain}\" target=\"_blank\" rel=\"noopener\">#{domain}</a>"
+					"<a href=\"#{domain}\">#{domain}</a>",
+					"<a href=\"#{domain}\" target=\"_blank\">#{domain}</a>",
+					"<a href=\"#{domain}\" target=\"_blank\" rel=\"noopener\">#{domain}</a>",
+					"<img=\"#{domain}\" alt=\"A text\" />"
 				]
 			}
 			it "does not replace quotation" do

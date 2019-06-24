@@ -62,10 +62,11 @@ module Integral
 
     def fix_quotations(s)
       return "" if s == "" || s.nil?
-      s.gsub(" \"", " «")           # after a space
-       .gsub(/\"(?=[\.,])/, "»")    # before a dot / comma
-       .gsub(/^\"/, "«")
-       .gsub(/(?<=[абвгдеёжзийклмнопрстуфхцчшщэюя])\"\s/i, "» ")
+      s.gsub(/^\"/, "«")            # at the beginning of line
+       .gsub(/\"$/, "»")            # at the end of line
+       .gsub(" \"", " «")           # after a space
+       .gsub(/\"(?=[\.,!?])/, "»")  # before a punctuation literal
+       .gsub(/(?<=[абвгдеёжзийклмнопрстуфхцчшщэюя])\"\s/i, "» ") # after an case-insentive cyrillic letter
     end
 
 

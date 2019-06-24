@@ -61,9 +61,9 @@ module Integral
 
 
     def fix_quotations(s)
-      return "" if s == ""
-      s.gsub(" \"", " «")
-       .gsub(/\"(?=[\.,])/, "»")
+      return "" if s == "" || s.nil?
+      s.gsub(" \"", " «")           # after a space
+       .gsub(/\"(?=[\.,])/, "»")    # before a dot / comma
        .gsub(/^\"/, "«")
        .gsub(/(?<=[абвгдеёжзийклмнопрстуфхцчшщэюя])\"\s/i, "» ")
     end

@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 RSpec.describe Integral::Corrector do
 
 	def tst(string)

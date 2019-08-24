@@ -3,7 +3,6 @@ require "pry"
 require "pry-byebug"
 
 require "integral/corrector"
-require "integral/text_calculations"
 
 RSpec.configure do |config|
   config.color = true

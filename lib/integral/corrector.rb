@@ -1,6 +1,7 @@
 # frozen_string_literal: false
 
 require "integral/corrector/version"
+require_relative "text_calculations"
 
 module Integral
   module Corrector
